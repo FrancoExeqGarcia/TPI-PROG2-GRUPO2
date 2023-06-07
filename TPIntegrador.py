@@ -4,9 +4,8 @@ class Libreria:
     def _init_(self):
         self.conexion = Conexiones()
         self.conexion.abrirConexion()
-        self.conexion.miCursor.execute("DROP TABLE IF EXISTS LIBROS")
         self.conexion.miCursor.execute(
-            "CREATE TABLE LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), precio FLOAT NOT NULL, cantidadDisponibles INTEGER NOT NULL, UNIQUE(titulo, autor))")
+            "create table if not exists LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30),genero VARCHAR(30), precio FLOAT NOT NULL,FechaUltimoPrecio VARCHAR(10),  cantidadDisponibles INTEGER NOT NULL, UNIQUE(titulo, autor))")
         self.conexion.miConexion.commit()
 
     def agregar_libro(self, titulo, autor, precio, cantidadDisponibles):
@@ -28,9 +27,25 @@ class Libreria:
         except:
             print("Error al modificar un libro")
 
+    def borrar_libro(self, id):
+        try:
+            self.conexion.miCursor.execute("DELETE FROM LIBROS WHERE id_libro = ?", (id))
+            self.conexion.miConexion.commit()
+            print("Libro borrado correctamente")
+        except:
+            print("Error al borrar un libro")
+
+    def cargar_stock(self, id, cantidad):
+        try:
+            self.conexion.miCursor.execute("UPDATE LIBROS SET cantidadDisponible = ? WHERE id_libro = ?",
+                                           (cantidad, id))
+            self.conexion.miConexion.commit()
+            print("Stock actualizado correctamente")
+        except:
+            print("Error al actualizar stock")
+
     def cerrar_libreria(self):
         self.conexion.cerrarConexion()
-
 
 
 
@@ -50,6 +65,8 @@ while True:
     print("Menu de opciones Libreria")
     print("1- Agregar libro")
     print("2- Modificar libro")
+    print("3- Borrar un libro")
+    print("4- Cargar disponibilidad")
     print("0- Salir del menú")
 
     opcion = int(input("Por favor ingrese un número: "))
@@ -65,6 +82,13 @@ while True:
         autor = input("Por favor ingrese el autor del libro a modificar: ")
         precio = float(input("Por favor ingrese el nuevo precio del libro: "))
         libreria.modificar_libro(titulo, autor, precio)
+    elif opcion == 3:
+        id_libro_borrar = input("Ingrece id de libro a borrar: ")
+        libreria.borrar_libro(id_libro_borrar)
+    elif opcion == 4:
+        id_libro_borrar = input("Ingrece id de libro a borrar: ")
+        cantidad_nueva = input("Ingrece el stock actual: ")
+        libreria.cargar_stock(id_libro_borrar, cantidad_nueva)
     elif opcion == 0:
         libreria.cerrar_libreria()
         break
