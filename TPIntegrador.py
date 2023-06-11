@@ -49,6 +49,24 @@ class Libreria:
 
     def cerrar_libreria(self):
         self.conexion.cerrarConexion()
+    def registrar_venta(self, id_libro, cantidad, fecha):
+        try:
+            self.conexion.miCursor.execute(
+            "CREATE TABLE IF NOT EXISTS Ventas (id_venta INTEGER PRIMARY KEY, id_libro INTEGER, cantidad INTEGER, fecha DATE)")
+            self.conexion.miConexion.commit()
+
+            self.conexion.miCursor.execute(
+            "INSERT INTO Ventas (id_libro, cantidad, fecha) VALUES (?, ?, ?)", (id_libro, cantidad, fecha))
+            self.conexion.miConexion.commit()
+
+            self.conexion.miCursor.execute(
+            "UPDATE LIBROS SET cantidadDisponibles = cantidadDisponibles - ? WHERE id_libro = ?",
+            (cantidad, id_libro))
+            self.conexion.miConexion.commit()
+
+            print("Venta registrada exitosamente")
+        except:
+            print("Error al registrar la venta")
 
 
 
@@ -101,6 +119,11 @@ while True:
         libreria.cargar_stock(id_libro_borrar, cantidad_nueva)
     elif opcion ==5:
         libreria.listar_libros()
+    elif opcion == 6:
+        id_libro = int(input("Por favor ingrese el ID del libro vendido: "))
+        cantidad = int(input("Por favor ingrese la cantidad vendida: "))
+        fecha = input("Por favor ingrese la fecha de la venta (YYYY-MM-DD): ")
+        libreria.registrar_venta(id_libro, cantidad, fecha)
     elif opcion == 0:
         libreria.cerrar_libreria()
         break
