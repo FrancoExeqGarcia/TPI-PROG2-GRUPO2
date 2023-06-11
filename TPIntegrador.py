@@ -43,6 +43,14 @@ class Libreria:
             print("Stock actualizado correctamente")
         except:
             print("Error al actualizar stock")
+    def listar_libros(self):
+        try:
+            self.conexion.miCursor.execute("SELECT * FROM LIBROS")
+            autos2 = self.conexion.miCursor.fetchall()
+            for auto in autos2:
+                print(auto)
+        except:
+            print("No se ha podido listar libros")   
 
     def cerrar_libreria(self):
         self.conexion.cerrarConexion()
@@ -67,6 +75,11 @@ while True:
     print("2- Modificar libro")
     print("3- Borrar un libro")
     print("4- Cargar disponibilidad")
+    print("5- Listado de Libros")
+    print("6- Ventas")
+    print("7- Actualizar Precios")
+    print("8- Listar libros por fecha")
+    print("0- Salir del menú")
     print("0- Salir del menú")
 
     opcion = int(input("Por favor ingrese un número: "))
@@ -89,6 +102,8 @@ while True:
         id_libro_borrar = input("Ingrece id de libro a borrar: ")
         cantidad_nueva = input("Ingrece el stock actual: ")
         libreria.cargar_stock(id_libro_borrar, cantidad_nueva)
+    elif opcion ==5:
+        libreria.listar_libros()
     elif opcion == 0:
         libreria.cerrar_libreria()
         break
