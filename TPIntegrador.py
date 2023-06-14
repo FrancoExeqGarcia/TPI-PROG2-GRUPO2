@@ -7,7 +7,7 @@ class Libreria:
         self.conexion = Conexiones()
         self.conexion.abrirConexion()
         self.conexion.miCursor.execute(
-            "CREATE TABLE IF NOT EXISTS LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), isbn INTEGER NOT NULL, precio FLOAT NOT NULL,fecha_ultimo_precio VARCHAR(10), cantidadDisponibles INTEGER NOT NULL, UNIQUE(titulo, autor))")
+            "CREATE TABLE IF NOT EXISTS LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), isbn INTEGER UNIQUE NOT NULL, precio FLOAT NOT NULL,fecha_ultimo_precio VARCHAR(10), cantidadDisponibles INTEGER NOT NULL, UNIQUE(titulo, autor))")
         self.conexion.miCursor.execute(
             "CREATE TABLE IF NOT EXISTS HISTORICO_LIBROS (id_libro INTEGER, isbn INTEGER, titulo VARCHAR(30), autor VARCHAR(30), genero VARCHAR(30), precio FLOAT NOT NULL, fecha_ultimo_precio VARCHAR(10), cantidad_disponible INTEGER NOT NULL)")
         self.conexion.miConexion.commit()
@@ -134,7 +134,7 @@ while True:
         isbn = input("Por favor ingrese el ISBN del libro: ")
         while len(isbn) != 13:
             print("El ISBN debe tener exactamente 13 digitos.")
-            isbn = input("Ingrese el ISBN (13 digitos): ")
+            isbn = int(input("Ingrese el ISBN (13 digitos): "))
         precio = float(input("Por favor ingrese el precio del libro: "))
         cantidadDisponibles = int(
             input("Por favor ingrese la cantidad de unidades disponibles: "))
