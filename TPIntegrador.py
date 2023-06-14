@@ -6,8 +6,8 @@ class Libreria:
     def __init__(self):
         self.conexion = Conexiones()
         self.conexion.abrirConexion()
-        self.conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), genero VARCHAR(30), isbn VARCHAR(13) NOT NULL, precio FLOAT NOT NULL,fecha_ultimo_precio VARCHAR(10), cantidadDisponibles INTEGER NOT NULL, UNIQUE(titulo, autor, isbn))")
-        self.conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS HISTORICO_LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), genero VARCHAR(30), isbn VARCHAR(13) NOT NULL, precio FLOAT NOT NULL,fecha_ultimo_precio VARCHAR(10), cantidadDisponibles INTEGER NOT NULL, UNIQUE(titulo, autor, isbn))")
+        self.conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), genero VARCHAR(30), isbn VARCHAR(13) NOT NULL, precio FLOAT NOT NULL,fecha_ultimo_precio VARCHAR(10), cantidadDisponibles INTEGER NOT NULL, UNIQUE(isbn))")
+        self.conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS HISTORICO_LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), genero VARCHAR(30), isbn VARCHAR(13) NOT NULL, precio FLOAT NOT NULL,fecha_ultimo_precio VARCHAR(10), cantidadDisponibles INTEGER NOT NULL, UNIQUE(isbn))")
         self.conexion.miConexion.commit()
 
     def agregar_libro(self, titulo, autor, genero, precio, cantidadDisponibles, isbn):
