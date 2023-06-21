@@ -47,6 +47,7 @@ class Libreria:
         try:
             self.conexion.miCursor.execute("SELECT * FROM LIBROS")
             libros = self.conexion.miCursor.fetchall()
+            print("ID | Nombre | AUTOR | GENERO | ISBN | PRECIO | FECHA ULTIMO PRECIO | STOCK |")
             for x in libros:
                 print(x)
         except:
