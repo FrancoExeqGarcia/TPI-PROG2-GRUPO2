@@ -12,7 +12,8 @@ class Libreria:
 
     def agregar_libro(self, titulo, autor, genero, precio, cantidadDisponibles, isbn):
         try:
-            self.conexion.miCursor.execute("INSERT INTO LIBROS (titulo, autor, genero, precio, cantidadDisponibles, isbn) VALUES (?, ?, ?, ?, ?, ?)", (titulo, autor, genero, precio, cantidadDisponibles, isbn))
+            fecha = datetime.now().strftime("%Y-%m-%d")
+            self.conexion.miCursor.execute("INSERT INTO LIBROS (titulo, autor, genero, precio, fecha_ultimo_precio, cantidadDisponibles, isbn) VALUES (?, ?, ?, ?, ?, ?, ?)", (titulo, autor, genero, precio, fecha, cantidadDisponibles, isbn))
             self.conexion.miConexion.commit()
             print("Libro agregado exitosamente")
         except:
