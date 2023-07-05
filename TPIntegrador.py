@@ -9,55 +9,74 @@ class Libreria:
         self.conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), genero VARCHAR(30), isbn VARCHAR(13) NOT NULL, precio FLOAT NOT NULL,fecha_ultimo_precio VARCHAR(10), cantidadDisponibles INTEGER NOT NULL, UNIQUE(isbn))")
         self.conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS HISTORICO_LIBROS (id_libro INTEGER PRIMARY KEY, titulo VARCHAR(30), autor VARCHAR(30), genero VARCHAR(30), isbn VARCHAR(13) NOT NULL, precio FLOAT NOT NULL,fecha_ultimo_precio VARCHAR(10), cantidadDisponibles INTEGER NOT NULL, UNIQUE(isbn))")
         self.conexion.miConexion.commit()
+        self.conexion.cerrarConexion()
 
     def agregar_libro(self, titulo, autor, genero, precio, cantidadDisponibles, isbn):
         try:
+            self.conexion.abrirConexion()
             fecha = datetime.now().strftime("%Y-%m-%d")
             self.conexion.miCursor.execute("INSERT INTO LIBROS (titulo, autor, genero, precio, fecha_ultimo_precio, cantidadDisponibles, isbn) VALUES (?, ?, ?, ?, ?, ?, ?)", (titulo, autor, genero, precio, fecha, cantidadDisponibles, isbn))
             self.conexion.miConexion.commit()
             print("Libro agregado exitosamente")
+            self.conexion.cerrarConexion()
         except:
             print("Error al agregar un libro")
 
     def modificar_libro(self, id, precio):
         try:
+            self.conexion.abrirConexion()
             self.conexion.miCursor.execute("UPDATE LIBROS SET precio = ? WHERE id_libro = ?", (precio, id))
             self.conexion.miConexion.commit()
             print("Libro modificado correctamente")
+            self.conexion.cerrarConexion()
         except:
             print("Error al modificar un libro")
 
     def borrar_libro(self, id):
         try:
+            self.conexion.abrirConexion()
             self.conexion.miCursor.execute("DELETE FROM LIBROS WHERE id_libro = ?", (id))
             self.conexion.miConexion.commit()
             print("Libro borrado correctamente")
+            self.conexion.cerrarConexion()
         except:
             print("Error al borrar un libro")
 
     def cargar_stock(self, id, cantidad):
         try:
+            self.conexion.abrirConexion()
             self.conexion.miCursor.execute("UPDATE LIBROS SET cantidadDisponibles = ? WHERE id_libro = ?", (cantidad, id))
             self.conexion.miConexion.commit()
             print("Stock actualizado correctamente")
+            self.conexion.cerrarConexion()
         except:
             print("Error al actualizar stock")
 
     def listar_libros(self):
         try:
+            self.conexion.abrirConexion()
             self.conexion.miCursor.execute("SELECT * FROM LIBROS")
             libros = self.conexion.miCursor.fetchall()
             print("ID | Nombre | AUTOR | GENERO | ISBN | PRECIO | FECHA ULTIMO PRECIO | STOCK |")
             for x in libros:
                 print(x)
+            self.conexion.cerrarConexion()
         except:
             print("No se pudo listar libros.")
 
-    def cerrar_libreria(self):
-        self.conexion.cerrarConexion()
-
     def registrar_venta(self, id_libro, cantidad):
         try:
+            if cantidad <= 0:
+                print("la cantidad de libros vendidos tiene que ser mayor a 0.")
+                return
+            self.conexion.abrirConexion()
+            self.conexion.miConexion.execute("SELECT cantidadDisponibles FROM LIBROS WHERE id_libro = ?",(id_libro,))
+            stock_disponible = self.conexion.miCursor.fetchone()
+            print(stock_disponible)
+            if cantidad > stock_disponible:
+                print("no se puede vender mas del stock disponible")
+                return
+            
             fecha = datetime.now().strftime("%Y-%m-%d")
             self.conexion.miCursor.execute("CREATE TABLE IF NOT EXISTS Ventas (id_venta INTEGER PRIMARY KEY, id_libro INTEGER, cantidad INTEGER, fecha DATE)")
             self.conexion.miConexion.commit()
@@ -66,29 +85,32 @@ class Libreria:
             self.conexion.miCursor.execute("UPDATE LIBROS SET cantidadDisponibles = cantidadDisponibles - ? WHERE id_libro = ?", (cantidad, id_libro))
             self.conexion.miConexion.commit()
             print("Venta registrada exitosamente")
-            print(fecha)
+            self.conexion.cerrarConexion()
         except:
             print("Error al registrar la venta")
 
     def actualizar_precios(self, porcentaje):
         try:
+            self.conexion.abrirConexion()
             fecha = datetime.now().strftime("%Y-%m-%d")
             self.conexion.miCursor.execute("INSERT INTO HISTORICO_LIBROS SELECT * FROM LIBROS")
             self.conexion.miConexion.commit()
             self.conexion.miCursor.execute("UPDATE LIBROS SET precio = precio * (1 + ? / 100), fecha_ultimo_precio = ?", (porcentaje, fecha))
             self.conexion.miConexion.commit()
             print("Precios actualizados correctamente")
-            print(fecha)
+            self.conexion.cerrarConexion()
         except:
             print("Error al actualizar los precios")
 
     def mostrar_registros_anteriores(self, fecha):
         try:
+            self.conexion.abrirConexion()
             self.conexion.miCursor.execute("SELECT * FROM LIBROS WHERE fecha_ultimo_precio < ?", (fecha,))
             registros = self.conexion.miCursor.fetchall()
             print("Registros anteriores a la fecha especificada:")
             for registro in registros:
                 print(registro)
+            self.conexion.cerrarConexion()
         except:
             print("Error al mostrar los registros anteriores")
 
@@ -161,7 +183,6 @@ while True:
         fecha = input("Por favor ingrese la fecha en formato YYYY-MM-DD: ")
         libreria.mostrar_registros_anteriores(fecha)
     elif opcion == 0:
-        libreria.cerrar_libreria()
         break
     else:
         print("Ingrese una opcion correcta")
